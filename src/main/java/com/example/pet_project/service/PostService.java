@@ -16,4 +16,5 @@ public interface PostService {
     Post postDTOToPost(PostDTO postDTO);
     PostDTO postToPostDto(Post post);
 
+    List<Post> findByAnimalIdAndCityId(Long cityId, Long animalId);
 }

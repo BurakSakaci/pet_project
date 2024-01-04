@@ -348,4 +348,13 @@ public class PetShopController {
         }
     }
 
+    @GetMapping("/findByAnimalIdAndCityId")
+    public ResponseEntity<List<Post>> findByAnimalIdAndCityId(@RequestParam Long cityId, @RequestParam Long animalId) {
+        try {
+            return new ResponseEntity<>(postService.findByAnimalIdAndCityId(cityId, animalId), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
 }

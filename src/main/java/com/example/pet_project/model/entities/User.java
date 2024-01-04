@@ -27,7 +27,7 @@ public class User {
     private String address;
 
     @ManyToOne
-    @JoinColumn(name = "city_code", nullable = false, foreignKey = @ForeignKey(name = "user_city_fk"))
+    @JoinColumn(name = "city_id", nullable = false, foreignKey = @ForeignKey(name = "user_city_fk"))
     private City city;
 
 }

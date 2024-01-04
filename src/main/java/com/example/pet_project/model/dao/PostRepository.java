@@ -11,4 +11,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("SELECT p FROM Post p where p.animal.name= :animalName")
     List<Post> findByAnimalName(@Param("animalName") String animalName);
+
+    @Query(value = "select p.* from post p, \"user\" u where p.user_id = u.id and u.city_id = :cityId " +
+            "intersect select p.* from post p where p.animal_id = :animalId", nativeQuery = true)
+    List<Post> findByAnimalIdAndCityId(@Param("cityId") Long cityId, @Param("animalId") Long animalId);
+
+
 }

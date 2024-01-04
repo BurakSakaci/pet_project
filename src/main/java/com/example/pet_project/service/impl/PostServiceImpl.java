@@ -102,4 +102,9 @@ public class PostServiceImpl implements PostService {
 
         return postDTO;
     }
+
+    @Override
+    public List<Post> findByAnimalIdAndCityId(Long cityId, Long animalId) {
+        return repository.findByAnimalIdAndCityId(cityId, animalId);
+    }
 }
