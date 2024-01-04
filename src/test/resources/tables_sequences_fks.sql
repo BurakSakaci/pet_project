@@ -56,12 +56,13 @@ create table city
 create table post
 (
     is_active    boolean,
-    animal_id    bigint not null,
+    animal_id    bigint,
     created_date timestamp(6),
     id           bigint not null,
     updated_date timestamp(6),
     user_id      bigint not null,
     description  varchar(255),
+    image_url    varchar(255),
     title        varchar(255),
     primary key (id)
 );
@@ -74,7 +75,7 @@ create table product
 );
 create table "user"
 (
-    city_code  bigint not null,
+    city_id  bigint not null,
     id         bigint not null,
     address    varchar(255),
     first_name varchar(255),
@@ -87,7 +88,5 @@ alter table if exists application add constraint application_post_fk foreign key
 alter table if exists application add constraint application_user_fk foreign key (user_id) references "user";
 alter table if exists post add constraint post_user_fk foreign key (user_id) references "user";
 alter table if exists product add constraint product_animal_fk foreign key (animal_id) references animal;
-alter table if exists "user" add constraint user_city_fk foreign key (city_code) references city;
+alter table if exists "user" add constraint user_city_fk foreign key (city_id) references city;
 alter table if exists post add constraint post_animal_fk foreign key (animal_id) references animal;
-
-alter table post add column image_url varchar(255);
