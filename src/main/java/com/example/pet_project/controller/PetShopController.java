@@ -245,4 +245,107 @@ public class PetShopController {
         }
     }
 
+
+    @DeleteMapping("/deleteAnimal/{id}")
+    public ResponseEntity<String> deleteAnimal(@PathVariable Long id) {
+        String message = "";
+        boolean deleted = true;
+        try {
+            animalService.deleteAnimal(id);
+        } catch (Exception e) {
+            deleted = false;
+            message = e.getMessage();
+        }
+        if (deleted) {
+            return new ResponseEntity<>(message, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/deleteApplication/{id}")
+    public ResponseEntity<String> deleteApplication(@PathVariable Long id) {
+        String message = "";
+        boolean deleted = true;
+        try {
+            applicationService.deleteApplication(id);
+        } catch (Exception e) {
+            deleted = false;
+            message = e.getMessage();
+        }
+        if (deleted) {
+            return new ResponseEntity<>(message, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/deleteCity/{id}")
+    public ResponseEntity<String> deleteCity(@PathVariable Long id) {
+        String message = "";
+        boolean deleted = true;
+        try {
+            cityService.deleteCity(id);
+        } catch (Exception e) {
+            deleted = false;
+            message = e.getMessage();
+        }
+        if (deleted) {
+            return new ResponseEntity<>(message, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/deletePost/{id}")
+    public ResponseEntity<String> deletePost(@PathVariable Long id) {
+        String message = "";
+        boolean deleted = true;
+        try {
+            postService.deletePost(id);
+        } catch (Exception e) {
+            deleted = false;
+            message = e.getMessage();
+        }
+        if (deleted) {
+            return new ResponseEntity<>(message, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/deleteProduct/{id}")
+    public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
+        String message = "";
+        boolean deleted = true;
+        try {
+            productService.deleteProduct(id);
+        } catch (Exception e) {
+            deleted = false;
+            message = e.getMessage();
+        }
+        if (deleted) {
+            return new ResponseEntity<>(message, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/deleteUser/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+        boolean deleted = true;
+        String message = "";
+        try {
+            userService.deleteUser(id);
+        } catch (Exception e) {
+            deleted = false;
+            message = e.getMessage();
+        }
+        if (deleted) {
+            return new ResponseEntity<>(message, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
 }
