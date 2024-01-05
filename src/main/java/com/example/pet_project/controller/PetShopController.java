@@ -57,8 +57,8 @@ public class PetShopController {
     }
 
     @PostMapping("/createApplication")
-    public ResponseEntity<Application> createApplication(@RequestBody Application application) {
-        Application createdApplication = applicationService.createApplication(application);
+    public ResponseEntity<Application> createApplication(@RequestBody ApplicationDTO applicationDTO) {
+        Application createdApplication = applicationService.createApplication(applicationDTO);
         return new ResponseEntity<>(createdApplication, HttpStatus.CREATED);
     }
 
@@ -357,4 +357,12 @@ public class PetShopController {
         }
     }
 
+    @GetMapping("/findByCityId")
+    public ResponseEntity<List<Post>> findByCityId(@RequestParam Long cityId) {
+        try {
+            return new ResponseEntity<>(postService.getPostsByCityId(cityId), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 }

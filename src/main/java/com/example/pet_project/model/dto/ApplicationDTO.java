@@ -11,6 +11,5 @@ public class ApplicationDTO {
     private Long id;
     private Long postId;
     private Long userId;
-    private Date applyDate;
     private Boolean isActive;
 }
