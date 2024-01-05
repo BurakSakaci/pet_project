@@ -55,19 +55,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public Integer checkUserLogin(UserLoginDTO userLoginDTO) {
         try {
-            User user = repository.getByUserName(userLoginDTO.getUserName());
-            if (user != null) {
-
-                if (user.getPassword().equals(userLoginDTO.getPassword())) {
-                    return 1; // success
-                } else {
-                    return 2; // invalid password
-                }
-            }
+            return repository.checkUserLogin(userLoginDTO.getUserName(), userLoginDTO.getPassword());
+//            User user = repository.getByUserName(userLoginDTO.getUserName());
+//            if (user != null) {
+//
+//                if (user.getPassword().equals(userLoginDTO.getPassword())) {
+//                    return 1; // success
+//                } else {
+//                    return 2; // invalid password
+//                }
+//            }
         } catch (Exception e) {
-            return 3;
+            return 3; // user not found
         }
-        return 3; // user not found
     }
 
     @Override
