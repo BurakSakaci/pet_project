@@ -6,12 +6,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
-import java.util.stream.LongStream;
 
 @Getter
 @Setter
 public class PostDTO {
-    @NotNull
     private Long id;
     private String userName;
     private Date createdDate;
