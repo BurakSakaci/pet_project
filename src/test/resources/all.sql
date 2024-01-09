@@ -487,28 +487,68 @@ END;
 $$
 LANGUAGE plpgsql;
 
+CREATE
+OR REPLACE FUNCTION log_user_changes()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Insert a log record when a user is inserted, updated, or deleted
+    IF
+TG_OP = 'INSERT' THEN
+        INSERT INTO user_audit_log (action, user_id, timestamp)
+        VALUES ('INSERT', NEW.id, CURRENT_TIMESTAMP);
+    ELSIF
+TG_OP = 'UPDATE' THEN
+        INSERT INTO user_audit_log (action, user_id, timestamp)
+        VALUES ('UPDATE', NEW.id, CURRENT_TIMESTAMP);
+    ELSIF
+TG_OP = 'DELETE' THEN
+        INSERT INTO user_audit_log (action, user_id, timestamp)
+        VALUES ('DELETE', OLD.id, CURRENT_TIMESTAMP);
+END IF;
 
--- Önce kullanıcı güncelleme fonksiyonunu çağırarak bir kullanıcıyı güncelleyelim
---SELECT update_user(1, 'Yeni Ad', 'Yeni Soyad', 'Yeni Adres', 'Yeni Parola');
---
---select u.id from "user" u where u.id =1
---union
---select p.id from post p where p.id =1
+RETURN NULL;
+END;
+$$
+LANGUAGE plpgsql;
 
---select * from post
+-- User tablosuna yeni bir kullanıcı eklenirse
+CREATE
+OR REPLACE FUNCTION user_insert_trigger()
+RETURNS TRIGGER AS $$
+BEGIN
+  PERFORM
+pg_notify('user_created', 'New user created: ' || NEW.user_name);
+RETURN NEW;
+END;
+$$
+LANGUAGE plpgsql;
 
---select * from animal
-
---select * from city
-
---select * from application
-
---select * from product
-
---SELECT * FROM information_schema.sequences WHERE sequence_name = 'seq_application_id';
-
---SELECT setval('seq_post_id', (SELECT MAX(id) FROM post));
-
---SELECT setval('seq_application_id', (SELECT MAX(id) FROM application));
+-- Trigger'ı tanımla
+CREATE TRIGGER after_user_insert
+    AFTER INSERT
+    ON "user"
+    FOR EACH ROW EXECUTE FUNCTION user_insert_trigger();
 
 
+-- Post tablosuna yeni bir ilan eklenirse
+CREATE
+OR REPLACE FUNCTION post_insert_trigger()
+RETURNS TRIGGER AS $$
+BEGIN
+  PERFORM
+pg_notify('post_created', 'New post created: ' || NEW.title);
+RETURN NEW;
+END;
+$$
+LANGUAGE plpgsql;
+
+-- Trigger'ı tanımla
+CREATE
+or replace TRIGGER after_post_insert
+AFTER INSERT ON post
+FOR EACH ROW EXECUTE FUNCTION post_insert_trigger();
+
+LISTEN
+user_created;
+LISTEN
+post_created;
