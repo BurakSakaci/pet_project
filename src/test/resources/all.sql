@@ -548,7 +548,12 @@ or replace TRIGGER after_post_insert
 AFTER INSERT ON post
 FOR EACH ROW EXECUTE FUNCTION post_insert_trigger();
 
-LISTEN
-user_created;
-LISTEN
-post_created;
+LISTEN user_created;
+LISTEN post_created;
+
+SELECT setval('seq_animal_id', (SELECT MAX(id) FROM animal));
+SELECT setval('seq_application_id', (SELECT MAX(id) FROM application));
+SELECT setval('seq_city_id', (SELECT MAX(id) FROM city));
+SELECT setval('seq_post_id', (SELECT MAX(id) FROM post));
+SELECT setval('seq_product_id', (SELECT MAX(id) FROM product));
+SELECT setval('seq_user_id', (SELECT MAX(id) FROM "user"));
