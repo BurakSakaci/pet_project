@@ -223,6 +223,8 @@ LANGUAGE plpgsql;
 
 
 
+DROP TYPE IF EXISTS user_login_result CASCADE;
+DROP FUNCTION IF EXISTS check_user_login CASCADE;
 
 --------Giriş kısmında bir sorgu yapılcak. kullanıcı adı ve password kontrolü için bunu
 CREATE TYPE user_login_result AS (
@@ -484,3 +486,29 @@ WHERE id = user_id_param;
 END;
 $$
 LANGUAGE plpgsql;
+
+
+-- Önce kullanıcı güncelleme fonksiyonunu çağırarak bir kullanıcıyı güncelleyelim
+--SELECT update_user(1, 'Yeni Ad', 'Yeni Soyad', 'Yeni Adres', 'Yeni Parola');
+--
+--select u.id from "user" u where u.id =1
+--union
+--select p.id from post p where p.id =1
+
+--select * from post
+
+--select * from animal
+
+--select * from city
+
+--select * from application
+
+--select * from product
+
+--SELECT * FROM information_schema.sequences WHERE sequence_name = 'seq_application_id';
+
+--SELECT setval('seq_post_id', (SELECT MAX(id) FROM post));
+
+--SELECT setval('seq_application_id', (SELECT MAX(id) FROM application));
+
+
