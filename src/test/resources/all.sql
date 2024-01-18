@@ -1,35 +1,3 @@
--- Drop sequences if they exist
-DROP SEQUENCE IF EXISTS seq_animal_id;
-DROP SEQUENCE IF EXISTS seq_application_id;
-DROP SEQUENCE IF EXISTS seq_city_id;
-DROP SEQUENCE IF EXISTS seq_post_id; -- Drop seq_post_id if it exists
-DROP SEQUENCE IF EXISTS seq_product_id;
-DROP SEQUENCE IF EXISTS seq_user_id;
-
--- Drop foreign key constraints
-ALTER TABLE IF EXISTS application DROP CONSTRAINT IF EXISTS application_post_fk;
-ALTER TABLE IF EXISTS application DROP CONSTRAINT IF EXISTS application_user_fk;
--- Remove the line that drops the "post_animal_fk" constraint if it doesn't exist.
-ALTER TABLE IF EXISTS post DROP CONSTRAINT IF EXISTS post_user_fk;
-ALTER TABLE IF EXISTS product DROP CONSTRAINT IF EXISTS product_animal_fk;
-ALTER TABLE IF EXISTS "user" DROP CONSTRAINT IF EXISTS user_city_fk;
-
--- Drop tables with CASCADE
-DROP TABLE IF EXISTS animal CASCADE;
-DROP TABLE IF EXISTS application CASCADE;
-DROP TABLE IF EXISTS city CASCADE;
-DROP TABLE IF EXISTS post CASCADE;
-DROP TABLE IF EXISTS product CASCADE;
-DROP TABLE IF EXISTS "user" CASCADE;
-
--- Recreate sequences if they don't exist
-CREATE SEQUENCE IF NOT EXISTS seq_animal_id START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE IF NOT EXISTS seq_application_id START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE IF NOT EXISTS seq_city_id START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE IF NOT EXISTS seq_post_id START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE IF NOT EXISTS seq_product_id START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE IF NOT EXISTS seq_user_id START WITH 1 INCREMENT BY 1;
-
 create table animal
 (
     id   bigint not null,
@@ -72,7 +40,7 @@ create table product
     name      varchar(255) not null,
     primary key (id)
 );
-create table "user"
+create table user
 (
     city_id    bigint not null,
     id         bigint not null,
@@ -83,7 +51,12 @@ create table "user"
     user_name  varchar(255),
     primary key (id)
 );
-
+create sequence seq_animal_id start with 1 increment by 1;
+create sequence seq_application_id start with 1 increment by 1;
+create sequence seq_city_id start with 1 increment by 1;
+create sequence seq_post_id start with 1 increment by 1;
+create sequence seq_product_id start with 1 increment by 1;
+create sequence seq_user_id start with 1 increment by 1;
 -- application tablosuna CASCADE özelliği ekleyerek foreign key tanımlama
 ALTER TABLE IF EXISTS application
     ADD CONSTRAINT application_post_fk
@@ -223,8 +196,6 @@ LANGUAGE plpgsql;
 
 
 
-DROP TYPE IF EXISTS user_login_result CASCADE;
-DROP FUNCTION IF EXISTS check_user_login CASCADE;
 
 --------Giriş kısmında bir sorgu yapılcak. kullanıcı adı ve password kontrolü için bunu
 CREATE TYPE user_login_result AS (
@@ -486,74 +457,7 @@ WHERE id = user_id_param;
 END;
 $$
 LANGUAGE plpgsql;
-
-CREATE
-OR REPLACE FUNCTION log_user_changes()
-RETURNS TRIGGER AS $$
-BEGIN
-    -- Insert a log record when a user is inserted, updated, or deleted
-    IF
-TG_OP = 'INSERT' THEN
-        INSERT INTO user_audit_log (action, user_id, timestamp)
-        VALUES ('INSERT', NEW.id, CURRENT_TIMESTAMP);
-    ELSIF
-TG_OP = 'UPDATE' THEN
-        INSERT INTO user_audit_log (action, user_id, timestamp)
-        VALUES ('UPDATE', NEW.id, CURRENT_TIMESTAMP);
-    ELSIF
-TG_OP = 'DELETE' THEN
-        INSERT INTO user_audit_log (action, user_id, timestamp)
-        VALUES ('DELETE', OLD.id, CURRENT_TIMESTAMP);
-END IF;
-
-RETURN NULL;
-END;
-$$
-LANGUAGE plpgsql;
-
--- User tablosuna yeni bir kullanıcı eklenirse
-CREATE
-OR REPLACE FUNCTION user_insert_trigger()
-RETURNS TRIGGER AS $$
-BEGIN
-  PERFORM
-pg_notify('user_created', 'New user created: ' || NEW.user_name);
-RETURN NEW;
-END;
-$$
-LANGUAGE plpgsql;
-
--- Trigger'ı tanımla
-CREATE TRIGGER after_user_insert
-    AFTER INSERT
-    ON "user"
-    FOR EACH ROW EXECUTE FUNCTION user_insert_trigger();
+-- Önce kullanıcı güncelleme fonksiyonunu çağırarak bir kullanıcıyı güncelleyelim
+SELECT update_user(1, 'Yeni Ad', 'Yeni Soyad', 'Yeni Adres', 'Yeni Parola');
 
 
--- Post tablosuna yeni bir ilan eklenirse
-CREATE
-OR REPLACE FUNCTION post_insert_trigger()
-RETURNS TRIGGER AS $$
-BEGIN
-  PERFORM
-pg_notify('post_created', 'New post created: ' || NEW.title);
-RETURN NEW;
-END;
-$$
-LANGUAGE plpgsql;
-
--- Trigger'ı tanımla
-CREATE
-or replace TRIGGER after_post_insert
-AFTER INSERT ON post
-FOR EACH ROW EXECUTE FUNCTION post_insert_trigger();
-
-LISTEN user_created;
-LISTEN post_created;
-
-SELECT setval('seq_animal_id', (SELECT MAX(id) FROM animal));
-SELECT setval('seq_application_id', (SELECT MAX(id) FROM application));
-SELECT setval('seq_city_id', (SELECT MAX(id) FROM city));
-SELECT setval('seq_post_id', (SELECT MAX(id) FROM post));
-SELECT setval('seq_product_id', (SELECT MAX(id) FROM product));
-SELECT setval('seq_user_id', (SELECT MAX(id) FROM "user"));
