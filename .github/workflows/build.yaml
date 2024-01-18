@@ -37,8 +37,8 @@ jobs:
               echo "GH_TOKEN: ${{ env.GH_TOKEN }}"
 
           - name: Debug Secret Value
-            run:
-              echo "GH_TOKEN_DENEME: ${{ secrets.GH_TOKEN }}"
+            run: |
+              echo "GH_TOKEN: ${{ secrets.GH_TOKEN }}"
 
 #      - name: Login to GitHub Container Registry
 #        uses: docker/login-action@v2
