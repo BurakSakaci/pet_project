@@ -11,6 +11,9 @@ env:
 
 jobs:
   build:
+    uses: ./.github/workflows/.build.yaml
+      # The following is required to use secrets in .build-application.yml:
+    secrets: inherit
     runs-on: ubuntu-latest
     steps:
       - name: Checkout action
