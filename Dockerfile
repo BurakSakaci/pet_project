@@ -1,6 +1,8 @@
-FROM amazoncorretto:21-alpine-jdk
-RUN mkdir /app
-COPY target/*.jar /app/app.jar
-WORKDIR /app
-EXPOSE 8080
+FROM maven:3-amazoncorretto-21 as build
+WORKDIR usr/src/app
+COPY . .
+RUN mvn clean package
+
+FROM amazoncorretto:21-alpine3.16-jdk
+COPY --from=build /usr/src/app/target/pet_project*.jar /app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
