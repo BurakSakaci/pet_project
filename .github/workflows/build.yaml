@@ -4,11 +4,6 @@ on:
   push:
     branches:
       - master
-  pull_request:
-    branches:
-      - master
-      - develop # Allow PRs from develop to be tested
-
 env:
   REGISTRY: ghcr.io
   REPO_OWNER: ${{ github.repository_owner }}
