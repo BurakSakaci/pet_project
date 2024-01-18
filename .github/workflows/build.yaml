@@ -1,4 +1,5 @@
 name: Build
+
 on:
   push:
     branches:
@@ -7,6 +8,7 @@ on:
     branches:
       - master
       - develop # Allow PRs from develop to be tested
+
 env:
   REGISTRY: ghcr.io
   REPO_OWNER: ${{ github.repository_owner }}
@@ -14,49 +16,49 @@ env:
 
 jobs:
   build:
+    runs-on: ubuntu-latest
     strategy:
-        matrix:
-            os: [ubuntu-latest]
-            node: [14]
-            image-name: ["petshop", "petshop-api-deneme"]
-    runs-on: ${{ matrix.os }}
+      matrix:
+        os: [ubuntu-latest]
+        node: [14]
+        image-name: ["petshop", "petshop-api-deneme"]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-        - name: Set up Java
-          uses: actions/setup-java@v4
-            with:
-                java-version: 21
-                distribution: 'corrretto'
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: 'corrretto'
 
-        - name: Build with Maven
-          working-directory: ./petshop
-          run: mvn -B package --file pom.xml
+      - name: Build with Maven
+        working-directory: ./petshop
+        run: mvn -B package --file pom.xml
 
-        - name: Rename JAR to app.jar
-          run: mv ./petshop/target/*.jar ./petshop/app.jar
+      - name: Rename JAR to app.jar
+        run: mv ./petshop/target/*.jar ./petshop/app.jar
 
-        - name: Login to GitHub Container Registry
-          uses: docker/login-action@v2
-          with:
-            registry: ${{ env.REGISTRY }}
-            username: ${{ github.actor }}
-            password: ${{ secrets.GH_TOKEN }}
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GH_TOKEN }}
 
-          - name: Extract image metadata for ${{ matrix.image-name }}
-            id: meta
-            uses: docker/metadata-action@v4
-            with:
-              images: ${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME }}:${{ matrix.image-name }}
+      - name: Extract image metadata for ${{ matrix.image-name }}
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME }}:${{ matrix.image-name }}
 
-            - name: Build and push
-                uses: docker/build-push-action@v4
-                with:
-                    context: ./petshop
-                    file: ./petshop/Dockerfile
-                    push: true
-                    tags: ${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME }}:${{ matrix.image-name }}
-                    labels: ${{ steps.meta.outputs.labels }}
-                    secrets: |
-                        GITHUB_TOKEN=${{ secrets.GH_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: ./petshop
+          file: ./petshop/Dockerfile
+          push: true
+          tags: ${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME }}:${{ matrix.image-name }}
+          labels: ${{ steps.meta.outputs.labels }}
+          secrets: |
+            GITHUB_TOKEN=${{ secrets.GH_TOKEN }}
